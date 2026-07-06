@@ -1,3 +1,5 @@
+import time
+
 import os
 from rich.text import Text
 from rich.layout import Layout
@@ -363,7 +365,7 @@ def draw_popup(title, items, selected_idx, term_width, term_height, mini_player,
     root_layout["footer"].update(Align.center(Text(footer_hint, style="dim grey50")))
     return root_layout
 
-def draw_home_dashboard(row_idx, col_idx, term_width, term_height, mini_player):
+def draw_home_dashboard(row_idx, col_idx, term_width, term_height, mini_player, home_loading, dashboard_sections, toast_message="", toast_time=0):
     """Генерує преміум дашборд YT Music з ASCII-арт карточками."""
     CARD_WIDTH = 26
     available_height = term_height - 7  # soundbar(4) + footer(1) + header(2)
@@ -483,12 +485,9 @@ def draw_home_dashboard(row_idx, col_idx, term_width, term_height, mini_player):
         Layout(name="footer", size=1)
     )
     # Тост повідомлення
-    global toast_message, toast_time
     if toast_message and (time.time() - toast_time) < 2.5:
         toast_text = Text(f"  ✅ {toast_message}  ", style="bold black on primary", justify="center")
         sections_list.append(Align.center(toast_text))
-    elif toast_message:
-        toast_message = ""
 
     main_content = Group(*sections_list)
     root_layout["main"].update(main_content)

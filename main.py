@@ -481,8 +481,10 @@ if __name__ == "__main__":
         pass
 
     try:
-        with term.cbreak(), term.hidden_cursor(), Live(draw_home_dashboard(0, 0, term.width, term.height, draw_mini_soundbar(song_data=song_info, elapsed=0, total_duration=1, is_paused=False, term_width=term.width)), console=console, screen=True, refresh_per_second=FPS) as live:
+        with term.cbreak(), term.hidden_cursor(), Live(draw_home_dashboard(0, 0, term.width, term.height, draw_mini_soundbar(song_data=song_info, elapsed=0, total_duration=1, is_paused=False, term_width=term.width), home_loading, dashboard_sections, toast_message, toast_time), console=console, screen=True, refresh_per_second=FPS) as live:
             while True:
+                if toast_message and (time.time() - toast_time) >= 2.5:
+                    toast_message = ""
                 tw = term.width
                 th = term.height
 
@@ -626,7 +628,7 @@ if __name__ == "__main__":
                 elif current_mode == "PLAYER":
                     live.update(draw_player_view(song_info, art_panel, elapsed, total_duration, current_volume, is_paused, next_title, term_width=tw, term_height=th, cava_enabled=cava_enabled))
                 elif current_mode == "HOME":
-                    live.update(draw_home_dashboard(home_row_idx, home_col_idx, tw, th, mini_player))
+                    live.update(draw_home_dashboard(home_row_idx, home_col_idx, tw, th, mini_player, home_loading, dashboard_sections, toast_message, toast_time))
                 elif current_mode == "MINI":
                     mini_layout = Layout()
                     header = Text("\n   ◆ PRISM PLAYER (Mini Mode) ◆\n", style="primary.bold", justify="center")
