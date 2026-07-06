@@ -1,3 +1,4 @@
+from rich.console import Group
 from rich.text import Text
 from rich.panel import Panel
 from rich.align import Align

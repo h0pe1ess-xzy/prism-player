@@ -30,7 +30,7 @@ from rich.panel import Panel
 from rich.table import Table
 from blessed import Terminal
 from prism.api.aggregator import search_all, get_dashboard_sections, get_stream_info, yt_client, refresh_yt_client, get_youtube_playlists, get_lyrics
-from prism.core.config import load_settings, save_settings
+from prism.core.config import settings, save_settings, CACHE_DIR, safe_cache_id
 from prism.core.history import add_to_history, get_history
 from prism.core.playlists import get_all_playlists, create_playlist, delete_playlist, add_track, remove_track, get_tracks
 
@@ -38,7 +38,6 @@ from prism.core.playlists import get_all_playlists, create_playlist, delete_play
 from rich.theme import Theme
 console = Console(theme=THEMES["Cyberpunk"])
 
-CACHE_DIR = "/tmp/prism_player_cache"
 os.makedirs(CACHE_DIR, exist_ok=True)
 
 # Auth is now handled in aggregator.py
@@ -46,7 +45,6 @@ os.makedirs(CACHE_DIR, exist_ok=True)
 # --- ГЛОБАЛЬНІ СТАНИ ---
 FPS = 15
 cava_states = {"left": [], "right": []}
-settings = load_settings()
 cava_enabled = settings.get("cava_enabled", True)
 current_volume = settings.get("default_volume", 50)
 theme_name = settings.get("theme", "Cyberpunk")
@@ -108,13 +106,6 @@ threading.Thread(target=fetch_home_dashboard, daemon=True).start()
 
 # --- РЕНДЕРИНГ ОБКЛАДИНКИ ---
 
-def safe_cache_id(item_id):
-    if not item_id: return "unknown"
-    import hashlib
-    s = str(item_id)
-    if "://" in s or "/" in s:
-        return hashlib.md5(s.encode()).hexdigest()
-    return s
 
 
 
@@ -432,6 +423,9 @@ if __name__ == "__main__":
     paused_time_accumulated = 0
     pause_start_mark = 0
 
+    # Ініціалізація глобальних змінних стану для потоків
+    elapsed = 0
+
     def discord_rpc_loop():
         import time
         try:
@@ -481,7 +475,7 @@ if __name__ == "__main__":
         pass
 
     try:
-        with term.cbreak(), term.hidden_cursor(), Live(draw_home_dashboard(0, 0, term.width, term.height, draw_mini_soundbar(song_data=song_info, elapsed=0, total_duration=1, is_paused=False, term_width=term.width), home_loading, dashboard_sections, toast_message, toast_time), console=console, screen=True, refresh_per_second=FPS) as live:
+        with term.cbreak(), term.hidden_cursor(), Live(draw_home_dashboard(0, 0, term.width, term.height, draw_mini_soundbar(song_data=song_info, elapsed=0, total_duration=1, is_paused=False, term_width=term.width), home_loading, home_data, toast_message, toast_time), console=console, screen=True, refresh_per_second=FPS) as live:
             while True:
                 if toast_message and (time.time() - toast_time) >= 2.5:
                     toast_message = ""
@@ -628,7 +622,7 @@ if __name__ == "__main__":
                 elif current_mode == "PLAYER":
                     live.update(draw_player_view(song_info, art_panel, elapsed, total_duration, current_volume, is_paused, next_title, term_width=tw, term_height=th, cava_enabled=cava_enabled))
                 elif current_mode == "HOME":
-                    live.update(draw_home_dashboard(home_row_idx, home_col_idx, tw, th, mini_player, home_loading, dashboard_sections, toast_message, toast_time))
+                    live.update(draw_home_dashboard(home_row_idx, home_col_idx, tw, th, mini_player, home_loading, home_data, toast_message, toast_time))
                 elif current_mode == "MINI":
                     mini_layout = Layout()
                     header = Text("\n   ◆ PRISM PLAYER (Mini Mode) ◆\n", style="primary.bold", justify="center")

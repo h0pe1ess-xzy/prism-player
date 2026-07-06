@@ -4,7 +4,9 @@ import random
 import requests
 from PIL import Image
 from rich.text import Text
-from prism.core.config import CACHE_DIR
+from prism.core.config import CACHE_DIR, safe_cache_id
+import time
+from io import BytesIO
 
 def download_cover_to_cache(cache_id, thumbnails_list):
     """Завантажує обкладинку за будь-яким ID (videoId, playlistId, browseId)."""

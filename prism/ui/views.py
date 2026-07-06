@@ -1,3 +1,5 @@
+from prism.ui.components import render_card
+
 import time
 
 import os
@@ -365,7 +367,7 @@ def draw_popup(title, items, selected_idx, term_width, term_height, mini_player,
     root_layout["footer"].update(Align.center(Text(footer_hint, style="dim grey50")))
     return root_layout
 
-def draw_home_dashboard(row_idx, col_idx, term_width, term_height, mini_player, home_loading, dashboard_sections, toast_message="", toast_time=0):
+def draw_home_dashboard(row_idx, col_idx, term_width, term_height, mini_player, home_loading, home_data, toast_message="", toast_time=0):
     """Генерує преміум дашборд YT Music з ASCII-арт карточками."""
     CARD_WIDTH = 26
     available_height = term_height - 7  # soundbar(4) + footer(1) + header(2)

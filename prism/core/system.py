@@ -1,5 +1,7 @@
 import os
 import subprocess
+import re
+from prism.core.config import settings
 
 def get_system_volume():
     try:
