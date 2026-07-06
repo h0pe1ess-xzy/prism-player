@@ -289,7 +289,7 @@ def start_track(track_dict, start_seconds=0):
             
             fx = settings.get("audio_fx", "Normal")
             if fx == "Nightcore":
-                af_filter += ",atempo=1.2,asetrate=44100*1.2,aresample=44100"
+                af_filter += ",asetrate=44100*1.15,aresample=44100"
             elif fx == "Slowed":
                 af_filter += ",atempo=0.85,asetrate=44100*0.85,aresample=44100,aecho=0.8:0.88:60:0.4"
 

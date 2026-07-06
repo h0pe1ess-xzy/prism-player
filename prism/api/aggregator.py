@@ -285,9 +285,9 @@ def get_stream_info(track_id, source, title="", artist=""):
         return "", 0
         
     ydl_opts = {
-        'format': 'bestaudio', 
-        'quiet': True, 
-        'no_warnings': True, 
+        'format': 'bestaudio/best',
+        'quiet': True,
+        'no_warnings': True,
         'check_formats': False,
         'extractor_args': {'youtube': ['player_client=android', 'player_skip=webpage']}
     }
@@ -429,7 +429,8 @@ def get_lyrics(title, artist):
                 url = f"https://lrclib.net/api/search?track_name={urllib.parse.quote(t)}&artist_name={urllib.parse.quote(a)}"
             else:
                 url = f"https://lrclib.net/api/search?track_name={urllib.parse.quote(t)}"
-            r = requests.get(url, timeout=5)
+            headers = {"User-Agent": "PrismPlayer/1.0 (https://github.com/h0pe1ess-xzy/prism-player)"}
+            r = requests.get(url, headers=headers, timeout=5)
             r.raise_for_status()
             return r.json()
 
@@ -470,7 +471,7 @@ def get_lyrics(title, artist):
         if best.get("syncedLyrics"):
             lines = []
             for line in best["syncedLyrics"].split('\n'):
-                match = re.match(r'\[(\d+):(\d+\.\d+)\](.*)', line)
+                match = re.match(r'\[(\d+):(\d+(?:\.\d+)?)\](.*)', line)
                 if match:
                     mins = int(match.group(1))
                     secs = float(match.group(2))
